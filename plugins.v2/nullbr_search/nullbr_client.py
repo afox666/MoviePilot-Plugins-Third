@@ -1,15 +1,18 @@
+import os
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from typing import Dict, Optional
 from app.log import logger
 
+# 开发者申请appid，用户填api_key即可
+NULLBR_APP_ID = ""
 
 class NullbrApiClient:
     """Nullbr API客户端"""
     
-    def __init__(self, app_id: str, api_key: str = None):
-        self._app_id = app_id
+    def __init__(self, api_key: str = None):
+        self._app_id = NULLBR_APP_ID
         self._api_key = api_key
         self._base_url = "https://api.nullbr.eu.org"
         

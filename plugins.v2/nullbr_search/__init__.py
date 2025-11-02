@@ -25,7 +25,6 @@ class nullbr_search(_PluginBase):
         super().__init__()
         # 基本配置
         self._enabled = False
-        self._app_id = None
         self._api_key = None
         self._resource_priority = ["115", "magnet", "ed2k", "video"]  # 默认优先级
         self._enable_115 = True
@@ -134,7 +133,6 @@ class nullbr_search(_PluginBase):
         config_oper = SystemConfigOper()
         if config:
             self._enabled = config.get("enabled", False)
-            self._app_id = config.get("app_id")
             self._api_key = config.get("api_key")
             
             # 构建资源优先级列表
@@ -167,17 +165,15 @@ class nullbr_search(_PluginBase):
                 logger.info(f"CloudSyncMedia已启用: {self._cms_url}")
         
         # 初始化API客户端
-        if self._enabled and self._app_id:
+        if self._enabled:
             try:
                 from .nullbr_client import NullbrApiClient
-                self._client = NullbrApiClient(self._app_id, self._api_key)
+                self._client = NullbrApiClient(self._api_key)
                 logger.info("Nullbr API客户端初始化成功")
             except Exception as e:
                 logger.error(f"Nullbr API客户端初始化失败: {str(e)}")
                 self._enabled = False
         else:
-            if not self._app_id:
-                logger.warning("Nullbr插件配置错误: 缺少APP_ID")
             self._client = None
         
         # 初始化CloudSyncMedia客户端
@@ -260,23 +256,6 @@ class nullbr_search(_PluginBase):
                 {
                     'component': 'VRow',
                     'content': [
-                    {
-                        'component': 'VCol',
-                        'props': {'cols': 12, 'md': 6},
-                        'content': [
-                        {
-                            'component': 'VTextField',
-                            'props': {
-                            'model': 'app_id',
-                            'label': 'APP_ID *',
-                            'placeholder': '请输入Nullbr API的APP_ID',
-                            'hint': '必填：用于API认证的应用ID',
-                            'persistent-hint': True,
-                            'clearable': True
-                            }
-                        }
-                        ]
-                    },
                     {
                         'component': 'VCol',
                         'props': {'cols': 12, 'md': 6},
@@ -633,7 +612,6 @@ class nullbr_search(_PluginBase):
         }
         ], {
         "enabled": False,
-        "app_id": "",
         "api_key": "",
         "enable_115": True,
         "enable_magnet": True,
@@ -768,7 +746,7 @@ class nullbr_search(_PluginBase):
                 self.post_message(
                     channel=channel,
                     title="配置错误",
-                    text="❌ API客户端未初始化\n\n请检查插件配置中的APP_ID设置",
+                    text="❌ API客户端未初始化\n\n请检查插件配置中的API_KEY设置",
                     userid=userid
                 )
                 return
